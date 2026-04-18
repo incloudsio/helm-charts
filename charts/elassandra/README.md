@@ -12,13 +12,14 @@ The Elassandra application source, Docker build, and product documentation live 
 
 - `https://github.com/incloudsio/elassandra`
 
-## Install From A Checkout
+## Install From Helm Repository
 
-Clone the chart repository and install from the chart directory:
+Add the published repository and install the chart:
 
 ```bash
-git clone https://github.com/incloudsio/helm-charts.git
-helm install elassandra ./helm-charts/charts/elassandra
+helm repo add elassandra https://charts.elassandra.org
+helm repo update
+helm install elassandra elassandra/elassandra
 ```
 
 Defaults are intentionally conservative:
@@ -37,11 +38,13 @@ Build and load the local image first:
 minikube image load elassandra:test
 ```
 
-Then install the minikube preset:
+Then download the minikube preset and install from the Helm repository:
 
 ```bash
-helm install elassandra ./helm-charts/charts/elassandra \
-  -f ./helm-charts/charts/elassandra/values-minikube.yaml
+curl -Lo values-minikube.yaml https://raw.githubusercontent.com/incloudsio/helm-charts/master/charts/elassandra/values-minikube.yaml
+
+helm install elassandra elassandra/elassandra \
+  -f values-minikube.yaml
 ```
 
 ## Provider Presets
@@ -56,14 +59,16 @@ The chart includes shallow provider presets:
 These presets focus on install-time defaults such as replica count, storage class,
 resource sizing, and affinity. They do not configure cloud identity integrations.
 
-Examples:
+Download the preset you want locally, then install from the Helm repository. Examples:
 
 ```bash
-helm install elassandra ./helm-charts/charts/elassandra \
-  -f ./helm-charts/charts/elassandra/values-aws.yaml
+curl -Lo values-aws.yaml https://raw.githubusercontent.com/incloudsio/helm-charts/master/charts/elassandra/values-aws.yaml
+helm install elassandra elassandra/elassandra \
+  -f values-aws.yaml
 
-helm install elassandra ./helm-charts/charts/elassandra \
-  -f ./helm-charts/charts/elassandra/values-gcp.yaml
+curl -Lo values-gcp.yaml https://raw.githubusercontent.com/incloudsio/helm-charts/master/charts/elassandra/values-gcp.yaml
+helm install elassandra elassandra/elassandra \
+  -f values-gcp.yaml
 ```
 
 ## Azure / AKS
@@ -80,10 +85,12 @@ az aks update \
   --name <aks-cluster> \
   --attach-acr elassandra
 
-helm upgrade --install elassandra ./helm-charts/charts/elassandra \
+curl -Lo values-azure.yaml https://raw.githubusercontent.com/incloudsio/helm-charts/master/charts/elassandra/values-azure.yaml
+
+helm upgrade --install elassandra elassandra/elassandra \
   --namespace elassandra \
   --create-namespace \
-  -f ./helm-charts/charts/elassandra/values-azure.yaml
+  -f values-azure.yaml
 ```
 
 If you are not attaching the ACR, create an image pull secret and pass it to the chart:
@@ -97,9 +104,11 @@ kubectl create secret docker-registry elassandra-acr \
   --docker-username=<acr-username> \
   --docker-password=<acr-password>
 
-helm upgrade --install elassandra ./helm-charts/charts/elassandra \
+curl -Lo values-azure.yaml https://raw.githubusercontent.com/incloudsio/helm-charts/master/charts/elassandra/values-azure.yaml
+
+helm upgrade --install elassandra elassandra/elassandra \
   --namespace elassandra \
-  -f ./helm-charts/charts/elassandra/values-azure.yaml \
+  -f values-azure.yaml \
   --set imagePullSecrets[0].name=elassandra-acr
 ```
 
@@ -110,18 +119,19 @@ Dashboards are optional and disabled by default.
 Enable them with the public upstream image:
 
 ```bash
-helm install elassandra ./helm-charts/charts/elassandra \
+helm install elassandra elassandra/elassandra \
   --set dashboards.enabled=true
 ```
 
 If you mirror Dashboards into your own registry, override `dashboards.image.repository`
 and `dashboards.image.tag` at install time.
 
-## Validate Before Installing
+## Validate The Chart Source
 
-Typical validation commands:
+If you are working from a checkout, typical validation commands are:
 
 ```bash
+git clone https://github.com/incloudsio/helm-charts.git
 helm lint ./helm-charts/charts/elassandra
 helm template elassandra ./helm-charts/charts/elassandra \
   -f ./helm-charts/charts/elassandra/values-minikube.yaml
