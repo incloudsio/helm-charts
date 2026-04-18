@@ -1,6 +1,6 @@
 image:
-  repository: ghcr.io/incloudsio/elassandra
-  tag: ""
+  repository: elassandra.azurecr.io/elassandra
+  tag: "1.3.20"
   pullPolicy: IfNotPresent
 
 imagePullSecrets: []
