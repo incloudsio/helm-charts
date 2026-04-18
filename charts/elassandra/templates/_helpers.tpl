@@ -1,16 +1,7 @@
-{{/* vim: set filetype=mustache: */}}
-{{/*
-Expand the name of the chart.
-*/}}
 {{- define "elassandra.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
-{{/*
-Create a default fully qualified app name.
-We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
-If release name contains chart name it will be used as a full name.
-*/}}
 {{- define "elassandra.fullname" -}}
 {{- if .Values.fullnameOverride -}}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" -}}
@@ -24,9 +15,48 @@ If release name contains chart name it will be used as a full name.
 {{- end -}}
 {{- end -}}
 
-{{/*
-Create chart name and version as used by the chart label.
-*/}}
 {{- define "elassandra.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+
+{{- define "elassandra.labels" -}}
+helm.sh/chart: {{ include "elassandra.chart" . }}
+app.kubernetes.io/name: {{ include "elassandra.name" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- end -}}
+
+{{- define "elassandra.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "elassandra.name" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end -}}
+
+{{- define "elassandra.serviceAccountName" -}}
+{{- if .Values.serviceAccount.create -}}
+{{- default (include "elassandra.fullname" .) .Values.serviceAccount.name -}}
+{{- else -}}
+{{- default "default" .Values.serviceAccount.name -}}
+{{- end -}}
+{{- end -}}
+
+{{- define "elassandra.seedHost" -}}
+{{- if .Values.elassandra.seeds -}}
+{{- .Values.elassandra.seeds -}}
+{{- else -}}
+{{- printf "%s-0.%s-headless.%s.svc.cluster.local" (include "elassandra.fullname" .) (include "elassandra.fullname" .) .Release.Namespace -}}
+{{- end -}}
+{{- end -}}
+
+{{- define "elassandra.image" -}}
+{{- $tag := default .Chart.AppVersion .Values.image.tag -}}
+{{- printf "%s:%s" .Values.image.repository $tag -}}
+{{- end -}}
+
+{{- define "elassandra.dashboardsHosts" -}}
+{{- if .Values.dashboards.opensearchHosts -}}
+{{- toJson .Values.dashboards.opensearchHosts -}}
+{{- else -}}
+{{- printf "[\"http://%s-search:%d\"]" (include "elassandra.fullname" .) (int .Values.searchService.port) -}}
+{{- end -}}
 {{- end -}}

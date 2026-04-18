@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "elassandra.fullname" . }}-search
+  labels:
+    {{- include "elassandra.labels" . | nindent 4 }}
+  {{- with .Values.searchService.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.searchService.type }}
+  selector:
+    {{- include "elassandra.selectorLabels" . | nindent 4 }}
+  ports:
+    - name: http
+      port: {{ .Values.searchService.port }}
+      targetPort: http
+      {{- if and (eq .Values.searchService.type "NodePort") .Values.searchService.nodePort }}
+      nodePort: {{ .Values.searchService.nodePort }}
+      {{- end }}

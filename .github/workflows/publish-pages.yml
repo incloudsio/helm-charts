@@ -1,0 +1,68 @@
+name: Publish Helm Repository
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Checkout existing gh-pages
+        id: ghpages
+        continue-on-error: true
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: .gh-pages
+          fetch-depth: 1
+
+      - name: Setup Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: v3.15.4
+
+      - name: Package charts and build index
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p .dist
+
+          if [ -f .gh-pages/index.yaml ]; then
+            find .gh-pages -maxdepth 1 -name '*.tgz' -exec cp {} .dist/ \;
+          fi
+
+          for dir in charts/*; do
+            if [ -f "$dir/Chart.yaml" ]; then
+              helm dependency update "$dir"
+              helm lint "$dir"
+              helm package "$dir" -d .dist
+            fi
+          done
+
+          if [ -f .gh-pages/index.yaml ]; then
+            helm repo index .dist --url https://charts.elassandra.org --merge .gh-pages/index.yaml
+          else
+            helm repo index .dist --url https://charts.elassandra.org
+          fi
+
+          echo "charts.elassandra.org" > .dist/CNAME
+          touch .dist/.nojekyll
+
+      - name: Publish to gh-pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: .dist

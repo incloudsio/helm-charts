@@ -1,0 +1,37 @@
+image:
+  repository: elassandra
+  tag: test
+  pullPolicy: IfNotPresent
+
+replicaCount: 1
+
+elassandra:
+  heap:
+    max: 1G
+    newSize: 256M
+  resources:
+    requests:
+      cpu: 500m
+      memory: 1536Mi
+    limits:
+      memory: 1536Mi
+  persistence:
+    storageClass: standard
+    size: 8Gi
+
+cqlService:
+  type: NodePort
+  nodePorts:
+    cql: 30042
+    jmx: 30199
+    thrift: 30160
+
+searchService:
+  type: NodePort
+  nodePort: 30200
+
+dashboards:
+  enabled: false
+  service:
+    type: NodePort
+    nodePort: 30601

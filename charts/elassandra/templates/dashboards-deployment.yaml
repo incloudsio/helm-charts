@@ -1,0 +1,56 @@
+{{- if .Values.dashboards.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "elassandra.fullname" . }}-dashboards
+  labels:
+    {{- include "elassandra.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.dashboards.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "elassandra.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: dashboards
+  template:
+    metadata:
+      labels:
+        {{- include "elassandra.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: dashboards
+        {{- with .Values.dashboards.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- with .Values.dashboards.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    spec:
+      containers:
+        - name: dashboards
+          image: "{{ .Values.dashboards.image.repository }}:{{ .Values.dashboards.image.tag }}"
+          imagePullPolicy: {{ .Values.dashboards.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.dashboards.service.port }}
+          env:
+            - name: OPENSEARCH_HOSTS
+              value: {{ include "elassandra.dashboardsHosts" . | quote }}
+            - name: DISABLE_SECURITY_DASHBOARDS_PLUGIN
+              value: "true"
+            {{- with .Values.dashboards.extraEnv }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          readinessProbe:
+            httpGet:
+              path: /api/status
+              port: http
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /api/status
+              port: http
+            initialDelaySeconds: 60
+            periodSeconds: 20
+          resources:
+            {{- toYaml .Values.dashboards.resources | nindent 12 }}
+{{- end }}

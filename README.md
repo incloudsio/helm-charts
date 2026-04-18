@@ -1,27 +1,89 @@
-# Strapdata HELM Charts [![Build Status](https://travis-ci.org/strapdata/helm-charts.svg?branch=master)](https://travis-ci.org/strapdata/helm-charts)
+# Elassandra Helm Charts
 
-[![Strapdata Logo](strapdata-logolong.png)](http://www.strapdata.io)
+This repository contains Helm charts related to Elassandra and companion services.
 
-## Usage
+## Current Elassandra Chart
 
-Add this HELM repository
+The current Elassandra chart source is:
 
-	helm repo add strapdata https://charts.strapdata.com	
+- `charts/elassandra`
 
-Update this HELM repository
+Application source, Docker build, and product documentation live in:
 
-	helm repo update
+- `https://github.com/incloudsio/elassandra`
 
-## Install charts
+## Use The Chart Today
 
-Install Elassandra from this HELM repository:
-
-	helm install --namespace "defaut" --set image.repo=strapdata/elassandra --set image.tag=6.2.3.11 strapdata/elassandra
-
-Install Fluentbit with an Elasticsearch pipeline + template for an optimized storage with Elassandra
+Until this repository is published as a Helm repository or OCI registry, install from a checkout:
 
 ```bash
-helm install --name my-fluentbit --set trackOffsets="true",\
-backend.type="es",backend.es.host="elassandra-elasticsearch.default.svc.cluster.local",backend.es.time_key="es_time",backend.es.pipeline="fluentbit",\
-parsers.enabled=true,parsers.json[0].name="docker",parsers.json[0].timeKey="time",parsers.json[0].timeFormat="%Y-%m-%dT%H:%M:%S.%L",parsers.json[0].timeKeep="Off" ./stable/fluent-bit
+git clone https://github.com/incloudsio/helm-charts.git
+helm install elassandra ./helm-charts/charts/elassandra
+```
+
+For Azure / AKS with the pushed ACR image:
+
+```bash
+helm upgrade --install elassandra ./helm-charts/charts/elassandra \
+  --namespace elassandra \
+  --create-namespace \
+  -f ./helm-charts/charts/elassandra/values-azure.yaml
+```
+
+## Other Charts
+
+This repository also contains related charts such as:
+
+- `charts/elassandra-operator`
+- `charts/elassandra-datacenter`
+- `charts/fluent-bit`
+- `charts/storageclass`
+
+## Recommended Publishing Path
+
+The cleanest long-term publishing options are:
+
+1. publish packaged charts through GitHub Pages at a domain such as `charts.elassandra.org`
+2. publish the chart as an OCI artifact in a registry such as ACR or GHCR
+
+OCI is generally the cleaner option for modern Helm distribution because it avoids maintaining a separate `index.yaml` repository flow.
+
+## Publishing To `charts.elassandra.org`
+
+This repository now includes a GitHub Actions workflow at:
+
+- `.github/workflows/publish-pages.yml`
+
+The workflow:
+
+- lints every chart under `charts/*`
+- packages each chart into `.tgz`
+- merges with any existing `gh-pages` `index.yaml`
+- regenerates `index.yaml` with `https://charts.elassandra.org`
+- writes `CNAME`
+- publishes the result to the `gh-pages` branch
+
+### What To Configure In GitHub
+
+After pushing these repo-side changes, set the following in GitHub:
+
+1. `Settings` -> `Pages`
+   - Source: `Deploy from a branch`
+   - Branch: `gh-pages`
+   - Folder: `/ (root)`
+
+2. `Settings` -> `Actions` -> `General`
+   - Workflow permissions: `Read and write permissions`
+
+3. Ensure your DNS has:
+   - `charts.elassandra.org CNAME incloudsio.github.io`
+
+### Resulting User Flow
+
+Once the first publish succeeds, users can install from your domain with:
+
+```bash
+helm repo add elassandra https://charts.elassandra.org
+helm repo update
+helm install elassandra elassandra/elassandra
 ```

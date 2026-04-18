@@ -1,0 +1,25 @@
+replicaCount: 3
+
+elassandra:
+  heap:
+    max: 2G
+    newSize: 512M
+  resources:
+    requests:
+      cpu: "1"
+      memory: 4Gi
+    limits:
+      memory: 4Gi
+  persistence:
+    storageClass: standard-rwo
+    size: 100Gi
+
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          topologyKey: kubernetes.io/hostname
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: elassandra

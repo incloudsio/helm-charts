@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "elassandra.fullname" . }}-headless
+  labels:
+    {{- include "elassandra.labels" . | nindent 4 }}
+  {{- with .Values.headlessService.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  clusterIP: None
+  publishNotReadyAddresses: {{ .Values.headlessService.publishNotReadyAddresses }}
+  selector:
+    {{- include "elassandra.selectorLabels" . | nindent 4 }}
+  ports:
+    - name: internode
+      port: 7000
+      targetPort: internode
+    - name: internode-tls
+      port: 7001
+      targetPort: internode-tls
+    - name: transport
+      port: 9300
+      targetPort: transport

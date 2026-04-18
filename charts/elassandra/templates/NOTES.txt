@@ -1,27 +1,15 @@
-Elassandra can be accessed through CQL ({{ .Values.config.ports.cql }}/tcp) and HTTP Elasticsearch (9200/tcp) on the clustered services cassandra and elasticsearch or on each node {{ template "elassandra.fullname" . }}-<index>.
+Elassandra has been deployed.
 
-Check your cassandra cluster status:
-kubectl exec -it -n {{ .Release.Namespace }} $(kubectl get pods -n {{ .Release.Namespace }} -l app={{ template "elassandra.name" . }},release={{ .Release.Name }} -o jsonpath='{.items[0].metadata.name}') -- nodetool status
+Search API:
+  kubectl port-forward svc/{{ include "elassandra.fullname" . }}-search 9200:{{ .Values.searchService.port }}
 
-Check your Elasticsearch cluster status, nodes or indices:
-kubectl exec -it -n {{ .Release.Namespace }} $(kubectl get pods -n {{ .Release.Namespace }} -l app={{ template "elassandra.name" . }},release={{ .Release.Name }} -o jsonpath='{.items[0].metadata.name}') -- curl http://localhost:9200/_cluster/state?pretty
-kubectl exec -it -n {{ .Release.Namespace }} $(kubectl get pods -n {{ .Release.Namespace }} -l app={{ template "elassandra.name" . }},release={{ .Release.Name }} -o jsonpath='{.items[0].metadata.name}') -- curl http://localhost:9200/_cat/nodes
-kubectl exec -it -n {{ .Release.Namespace }} $(kubectl get pods -n {{ .Release.Namespace }} -l app={{ template "elassandra.name" . }},release={{ .Release.Name }} -o jsonpath='{.items[0].metadata.name}') -- curl http://localhost:9200/_cat/indices?v
+CQL:
+  kubectl port-forward svc/{{ include "elassandra.fullname" . }}-cql 9042:{{ .Values.cqlService.port }}
 
-To index a JSON document in Elassandra, run:
-kubectl exec -it -n {{ .Release.Namespace }} $(kubectl get pods -n {{ .Release.Namespace }} -l app={{ template "elassandra.name" . }},release={{ .Release.Name }} -o jsonpath='{.items[0].metadata.name}') -- curl -XPUT -H "Content-Type: application/json" http://localhost:9200/test/mytype/1 -d '{ "foo":"bar" }'
+{{- if .Values.dashboards.enabled }}
+OpenSearch Dashboards:
+  kubectl port-forward svc/{{ include "elassandra.fullname" . }}-dashboards 5601:{{ .Values.dashboards.service.port }}
+{{- end }}
 
-If you want to connect to the Cassandra CQL run the following:
-kubectl exec -it -n {{ .Release.Namespace }} $(kubectl get pods -n {{ .Release.Namespace }} -l "app={{ template "elassandra.name" . }},release={{ .Release.Name }}" -o jsonpath="{.items[0].metadata.name}") -- cqlsh
-
-Elassandra pod logs:
-kubectl logs -f -n {{ .Release.Namespace }} $(kubectl get pods -n {{ .Release.Namespace }} -l app={{ template "elassandra.name" . }},release={{ .Release.Name }} -o jsonpath='{ .items[0].metadata.name }')
-
-To forward the API port to localhost:9042 run the following:
-- kubectl port-forward -n {{ .Release.Namespace }} $(kubectl get pods -n {{ .Release.Namespace }} -l app={{ template "elassandra.name" . }},release={{ .Release.Name }} -o jsonpath='{ .items[0].metadata.name }') 9042:{{ .Values.config.ports.cql }}
-
-{{- if not .Values.persistence.enabled }}
-Note that the cluster is running with node-local storage instead of PersistentVolumes. In order to prevent data loss,
-pods will be decommissioned upon termination. Decommissioning may take some time, so you might also want to adjust the
-pod termination gace period, which is currently set to {{ .Values.podSettings.terminationGracePeriodSeconds }} seconds.
-{{- end}}
+Minikube preset example:
+  helm install {{ .Release.Name }} ./charts/elassandra -f charts/elassandra/values-minikube.yaml

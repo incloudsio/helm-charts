@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "elassandra.fullname" . }}-cql
+  labels:
+    {{- include "elassandra.labels" . | nindent 4 }}
+  {{- with .Values.cqlService.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.cqlService.type }}
+  selector:
+    {{- include "elassandra.selectorLabels" . | nindent 4 }}
+  ports:
+    - name: cql
+      port: {{ .Values.cqlService.port }}
+      targetPort: cql
+      {{- if and (eq .Values.cqlService.type "NodePort") .Values.cqlService.nodePorts.cql }}
+      nodePort: {{ .Values.cqlService.nodePorts.cql }}
+      {{- end }}
+    - name: jmx
+      port: {{ .Values.cqlService.jmxPort }}
+      targetPort: jmx
+      {{- if and (eq .Values.cqlService.type "NodePort") .Values.cqlService.nodePorts.jmx }}
+      nodePort: {{ .Values.cqlService.nodePorts.jmx }}
+      {{- end }}
+    - name: thrift
+      port: {{ .Values.cqlService.thriftPort }}
+      targetPort: thrift
+      {{- if and (eq .Values.cqlService.type "NodePort") .Values.cqlService.nodePorts.thrift }}
+      nodePort: {{ .Values.cqlService.nodePorts.thrift }}
+      {{- end }}
