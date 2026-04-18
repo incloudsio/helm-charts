@@ -3,9 +3,9 @@ entries:
   coredns-forwarder:
   - apiVersion: v1
     appVersion: "1.0"
-    created: "2026-04-18T11:15:39.149184371Z"
+    created: "2026-04-18T11:59:25.493691074Z"
     description: A Helm chart to deploy a core-dns forwarder
-    digest: 34b9bd338f6be5ddaa6c1751269ebbe6c04f1590873b56532e8521c139da44e1
+    digest: a913e276460f1ec3c9cb2daab9dab692be70fabfc38a5a3724e8d1c64f545d38
     name: coredns-forwarder
     urls:
     - https://charts.elassandra.org/coredns-forwarder-0.1.0.tgz
@@ -13,9 +13,9 @@ entries:
   elassandra:
   - apiVersion: v2
     appVersion: 1.3.20
-    created: "2026-04-18T11:15:39.149825638Z"
+    created: "2026-04-18T11:59:25.494557441Z"
     description: Helm chart for running Elassandra with optional OpenSearch Dashboards.
-    digest: c26a9fc211ee7314596c771a3032b5e5c7923194e2dd07a0dd648f73e6304095
+    digest: ff6c2d8dd6a44db74ec3a1e32e6334064ec10d7cc5d58305189a4e32ede14077
     home: https://elassandra.org
     keywords:
     - elassandra
@@ -35,10 +35,10 @@ entries:
   elassandra-datacenter:
   - apiVersion: v1
     appVersion: "1.1"
-    created: "2026-04-18T11:15:39.150497131Z"
+    created: "2026-04-18T11:59:25.495501292Z"
     description: A Helm chart for creating Elassandra datacenter using the Elassandra
       operator
-    digest: cf867c9ebc0855c78cc8a5c456d1f2e78342dde71fb015b3a7dad87eb765cd77
+    digest: 5c0ef4945be3ae1c342e497ba3d0b48c5434a6812903c9c4efb8dc90eb3cb878
     home: http://www.strapdata.com
     icon: https://github.com/strapdata/elassandra.io/blob/gh-pages/elassandra.svg
     keywords:
@@ -62,9 +62,9 @@ entries:
   elassandra-operator:
   - apiVersion: v1
     appVersion: "1.1"
-    created: "2026-04-18T11:15:39.151148276Z"
+    created: "2026-04-18T11:59:25.496472358Z"
     description: A Helm chart for the Elassandra operator
-    digest: c45ba80aea72b51635dc55693217060c1781f58cf8e286fd18d0ff5f6cd27d0b
+    digest: 4c03a4ad6bd4d1150a9ddf6ad19cf6aac8ba0915066c754cf877cfa489728de5
     home: http://www.strapdata.com
     icon: https://github.com/strapdata/elassandra.io/blob/gh-pages/elassandra.svg
     keywords:
@@ -88,9 +88,9 @@ entries:
   fluent-bit:
   - apiVersion: v1
     appVersion: 0.13.0
-    created: "2026-04-18T11:15:39.151698303Z"
+    created: "2026-04-18T11:59:25.497239927Z"
     description: Fast and Lightweight Log/Data Forwarder for Linux, BSD and OSX
-    digest: 9ce298d111364aa319d0b92494154c09e762b8adb746723536464a9c526118bd
+    digest: 7379bcb71b7fecfbce8d5ef4a334982863f77fb30a714fd5e5b042db2e21ac46
     home: http://fluentbit.io
     icon: http://fluentbit.io/assets/img/logo1-default.png
     keywords:
@@ -112,9 +112,9 @@ entries:
   storageclass:
   - apiVersion: v1
     appVersion: "1.0"
-    created: "2026-04-18T11:15:39.151874752Z"
+    created: "2026-04-18T11:59:25.497464456Z"
     description: A Helm chart to deploy Kubernetes custom storageclass
-    digest: 3485df3b046a77956472abcbb03d5a87feb2ace4e71ed957fb203ac150922256
+    digest: cf44702d57600503196901c79524c9a41a34bea8c3bf9f01d17338d51ea4c73a
     home: http://www.strapdata.com
     maintainers:
     - email: vroyer@strapdata.com
@@ -125,4 +125,4 @@ entries:
     urls:
     - https://charts.elassandra.org/storageclass-0.1.0.tgz
     version: 0.1.0
-generated: "2026-04-18T11:15:39.148898036Z"
+generated: "2026-04-18T11:59:25.493249527Z"
